@@ -11,7 +11,7 @@ catkin_package(
   CATKIN_DEPENDS rospy geometry_msgs
 )
 
-catkin_install_python(PROGRAMS scripts/teleop_key
+catkin_install_python(PROGRAMS scripts/teleop_key.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch

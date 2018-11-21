@@ -1,27 +1,8 @@
-/*******************************************************************************
-* Copyright 2016 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
-
-/* Authors: Yoonseok Pyo */
-
-#include <model_sim/model_sim.h>
+#include <model_sim.h>
 
 Modelsim::Modelsim()
 : nh_priv_("~")
 {
-  //Init fake turtlebot node
   ROS_ASSERT(init());
 }
 
@@ -29,19 +10,16 @@ Modelsim::~Modelsim()
 {
 }
 
+#define wheel_seperation_ 0.160
+#define turning_radius_ 0.080
+#define robot_radius_ 0.105
+ 
 /*******************************************************************************
 * Init function
 *******************************************************************************/
 bool Modelsim::init()
 {
   // initialize ROS parameter
-
-  
-  double wheel_seperation_ = 0.160;
-  double turning_radius_   = 0.080;
-  double robot_radius_     = 0.105;
- 
-
   nh_.param("wheel_left_joint_name", joint_states_name_[LEFT],  std::string("wheel_left_joint"));
   nh_.param("wheel_right_joint_name", joint_states_name_[RIGHT],  std::string("wheel_right_joint"));
   nh_.param("joint_states_frame", joint_states_.header.frame_id, std::string("base_footprint"));
@@ -232,7 +210,7 @@ bool Modelsim::update()
 *******************************************************************************/
 int main(int argc, char* argv[])
 {
-  ros::init(argc, argv, "turtlebot3_fake_node");
+  ros::init(argc, argv, "model_sim_node");
   Modelsim tb3fake;
 
   ros::Rate loop_rate(30);
