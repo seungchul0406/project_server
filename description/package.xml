@@ -5,7 +5,7 @@
   <description>
     3D model of the model for simulation and visualization
   </description>
-  <license>Apache License 2.0</license>
+  <license>MLCS</license>
   <author email="seungchul0406@gmail.com">Ha</author>
   <maintainer email="seungchul0406@gmail.com">Ha</maintainer>
   <buildtool_depend>catkin</buildtool_depend>

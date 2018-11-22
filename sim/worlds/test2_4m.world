@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+   <world name="default">
+      <include>
+         <uri>model://ground_plane</uri>
+      </include>
+      <include>
+         <uri>model://sun</uri>
+      </include>
+      <include>
+          <uri>model://test2_4m</uri>
+      </include>
+      <actor name="animated_box">
+        <link name="box_link">
+          <visual name="visual">
+            <geometry>
+              <cylinder>
+                <radius>0.3</radius>
+                <length>1.8</length>
+              </cylinder>
+            </geometry>
+          </visual>
+          <collision name="collision">
+            <geometry>
+              <cylinder>
+                <radius>0.3</radius>
+                <length>1.8</length>
+              </cylinder>
+            </geometry>
+          </collision>
+        </link>
+        <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="square">
+             <waypoint>
+                <time>0.0</time>
+                <pose>0 3 1 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>7.5</time>
+                <pose>0 4.5 1 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>15</time>
+                <pose>0 6 1 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>22.5</time>
+                <pose>0 4.5 1 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>30</time>
+                <pose>0 3 1 0 0 0</pose>
+             </waypoint>
+          </trajectory>
+        </script>
+      </actor>
+   </world>
+</sdf>

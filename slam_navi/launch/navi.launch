@@ -1,27 +1,11 @@
-<!-- Turtlebot3 -->
-
 <launch>
-  <!--- Robot -->
-  <include file="$(find turtlebot3_bringup)/launch/includes/description.launch.xml"/>
-  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+  <!-- Tf publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="50.0" />
   </node>
-
+  
   <!-- Map server -->
-  <arg name="map_file" default="$(find slam_navi)/maps/map.yaml"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
-  </node>
-
-  <!--- Depth image to laser scan -->
-  <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" >
-    <param name="scan_height" value="1"/>
-    <param name="range_min" value="0.1"/>
-    <param name="range_max" value="10"/>
-    <param name="output_frame_id" value="base_link"/>
-    <remap from="image" to="camera/depth/image_raw"/>
-    <remap from="scan" to="scan/depth"/>
-    <param name="scan_time" value="10.0"/>
-  </node>
+  <node pkg="map_server" name="map_server" type="map_server" args="$(find slam_navi)/maps/map.yaml"/>
 
   <!-- AMCL -->
   <node pkg="amcl" type="amcl" name="amcl">
@@ -56,30 +40,19 @@
     <param name="odom_frame_id"             value="odom"/>
     <param name="base_frame_id"             value="base_footprint"/>
   </node>
- 
-  <!-- Move_Base -->
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base">
+
+  <!-- move_base -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-    <rosparam file="$(find slam_navi)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find slam_navi)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find slam_navi)/param/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find slam_navi)/param/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find slam_navi)/param/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find slam_navi)/param/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find slam_navi)/param/move_base_params.yaml" command="load" />
-    <rosparam file="$(find slam_navi)/param/dwa_local_planner_params.yaml" command="load" />
-    <remap from="cmd_vel" to="/mobile_base/commands/velocity"/>
+    <rosparam file="$(find slam_navi)/param/dwa_local_planner_params_$(arg model).yaml" command="load" />
   </node>
 
-  <!-- run RViz node (visualization) -->
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find slam_navi)/rviz/navi.rviz">
-  </node>
-  
-  <!-- Darknet -->
-  <include file="$(find darknet_ros)/launch/darknet_ros.launch"/>
-  
-  <!-- reinforcement -->
-  <node pkg="turtlebot3_navigation" type="reinforcement.py" name="reinforcement" output="screen">
-  <param name="map_topic" value="/map"/>
-  <param name="rate" value="100"/>
-  </node>
+  <!-- Run RViz node (visualization) -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find slam_navi)/rviz/slam.rviz"/>
 
 </launch>

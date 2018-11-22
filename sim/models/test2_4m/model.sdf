@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="Dynamic Env Test2">
+    <static>true</static>
+    <link name="link1">
+      <pose>0 4 0.1 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>4 10 0.2</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <box>
+            <size>4 10 0.2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <link name="link2">
+      <pose>2.1 4 1 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.2 10 2</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <box>
+            <size>0.2 10 2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <link name="link3">
+      <pose>-2.1 4 1 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.2 10 2</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <box>
+            <size>0.2 10 2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <link name="link4">
+      <pose>1.7 7.4 1 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.6 0.2 2</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <box>
+            <size>0.6 0.2 2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <link name="link5">
+      <pose>-1.7 7.4 1 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.6 0.2 2</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <box>
+            <size>0.6 0.2 2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <link name="link6">
+      <pose>0 -1.1 1 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>4.4 0.2 2</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <box>
+            <size>4.4 0.2 2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <link name="link7">
+      <pose>0 9.1 1 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>4.4 0.2 2</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <box>
+            <size>4.4 0.2 2</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -51,11 +51,11 @@ if __name__=="__main__":
         while(1):
             key = getKey()
             if key == 'w' :
-                target_linear_vel = target_linear_vel + 0.01
+                target_linear_vel = target_linear_vel + 0.05
                 status = status + 1
                 print vels(target_linear_vel,target_angular_vel)
             elif key == 'x' :
-                target_linear_vel = target_linear_vel - 0.01
+                target_linear_vel = target_linear_vel - 0.05
                 status = status + 1
                 print vels(target_linear_vel,target_angular_vel)
             elif key == 'a' :

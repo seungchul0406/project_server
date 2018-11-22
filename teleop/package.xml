@@ -7,7 +7,7 @@
   </description>
   <author email="seungchul0406@gmail.com">Ha</author>
   <maintainer email="seungchul0406@gmail.com">Ha</maintainer>
-  <license>BSD</license>
+  <license>MLCS</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
   <build_depend>geometry_msgs</build_depend>

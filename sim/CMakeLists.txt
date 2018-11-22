@@ -8,30 +8,19 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   tf
+  gazebo_ros
 )
 
+find_package(gazebo REQUIRED)
+
 catkin_package(
-  INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs nav_msgs tf turtlebot3_msgs
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs geometry_msgs nav_msgs tf gazebo_ros
 )
 
 include_directories(
-  include
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(model_sim_node src/model_sim.cpp)
-add_dependencies(model_sim_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(model_sim_node ${catkin_LIBRARIES})
-
-install(TARGETS model_sim_node
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-
-install(DIRECTORY launch rviz
+install(DIRECTORY launch models worlds 
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
