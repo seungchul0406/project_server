@@ -49,3 +49,8 @@ teleop
 ```bash
 roslaunch teleop teleop_key.launch
 ```
+
+autonomous slam
+```bash
+roslaunch auto_slam single_sim.launch
+```

@@ -1,9 +1,9 @@
-<!-- Launches Kobuki Gazebo simulation in an empty world -->
+<!-- Launches turtlebot3 Gazebo simulation in the world -->
 <launch>
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
-<arg name="use_sim_time" value="true"/>
-<arg name="debug" value="false"/>
-<arg name="world_name" value="$(find sim)/worlds/autorace.world"/>
+	<arg name="use_sim_time" value="true"/>
+	<arg name="debug" value="false"/>
+	<arg name="world_name" value="$(find sim)/worlds/autorace.world"/>
 </include>
 
 <!-- spawn robot 1-->
@@ -83,5 +83,7 @@
 <remap from="move_base_simple/goal" to="robot_1/move_base_simple/goal"/>
 </node>
 
+<!-- RRT algorithm -->
+<include file="$(find auto_slam)/launch/auto_slam_three.launch"/>
 
 </launch>
