@@ -130,7 +130,7 @@ line.lifetime = ros::Duration();
 geometry_msgs::Point p;  
 
 
-while(points.points.size()<5)
+while(points.points.size()<3)
 {
 ros::spinOnce();
 
@@ -145,7 +145,7 @@ temp1.push_back(points.points[0].x);
 temp1.push_back(points.points[0].y);
 	
 std::vector<float> temp2; 
-temp2.push_back(points.points[2].x);
+temp2.push_back(points.points[1].x);
 temp2.push_back(points.points[0].y);
 
 
@@ -156,7 +156,7 @@ temp1.push_back(points.points[0].x);
 temp1.push_back(points.points[0].y);
 
 temp2.push_back(points.points[0].x);
-temp2.push_back(points.points[2].y);
+temp2.push_back(points.points[1].y);
 
 init_map_y=Norm(temp1,temp2);
 temp1.clear();		temp2.clear();
@@ -169,7 +169,7 @@ Xstarty=(points.points[0].y+points.points[2].y)*.5;
 
 
 geometry_msgs::Point trans;
-trans=points.points[4];
+trans=points.points[2];
 std::vector< std::vector<float>  > V; 
 std::vector<float> xnew; 
 xnew.push_back( trans.x);xnew.push_back( trans.y);  

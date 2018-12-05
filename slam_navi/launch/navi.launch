@@ -44,12 +44,12 @@
   <!-- move_base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-    <rosparam file="$(find slam_navi)/param/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find slam_navi)/param/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find slam_navi)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find slam_navi)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find slam_navi)/param/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find slam_navi)/param/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find slam_navi)/param/move_base_params.yaml" command="load" />
-    <rosparam file="$(find slam_navi)/param/dwa_local_planner_params_$(arg model).yaml" command="load" />
+    <rosparam file="$(find slam_navi)/param/dwa_local_planner_params.yaml" command="load" />
   </node>
 
   <!-- Run RViz node (visualization) -->

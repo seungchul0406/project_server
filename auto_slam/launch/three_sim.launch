@@ -79,7 +79,7 @@
 
 
 <!-- run RViz node (visualization) -->
-<node pkg="rviz" type="rviz" name="rviz" args="-d $(find auto_slam)/launch/includes/rviz_config/three.rviz">
+<node pkg="rviz" type="rviz" name="rviz" args="-d $(find auto_slam)/rviz/three.rviz">
 <remap from="move_base_simple/goal" to="robot_1/move_base_simple/goal"/>
 </node>
 
