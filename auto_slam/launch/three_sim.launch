@@ -86,4 +86,7 @@
 <!-- RRT algorithm -->
 <include file="$(find auto_slam)/launch/auto_slam_three.launch"/>
 
+<!-- Darknet -->
+<include file="$(find darknet_ros)/launch/darknet_ros.launch"/>
+
 </launch>
