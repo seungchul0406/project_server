@@ -38,7 +38,7 @@ def vels(target_linear_vel, target_angular_vel):
 if __name__=="__main__":
     settings = termios.tcgetattr(sys.stdin)
 
-    rospy.init_node('teleop')
+    rospy.init_node('teleop_key')
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
 
     status = 0
