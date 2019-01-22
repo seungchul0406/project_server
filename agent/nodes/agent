@@ -1,0 +1,214 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2011, Willow Garage, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#    * Neither the name of the Willow Garage, Inc. nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#       this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+import rospy
+import numpy as np
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+from sensor_msgs.msg import LaserScan
+import os
+from copy import copy
+
+# import sys, select, termios, tty
+
+os.chdir(os.path.dirname(__file__))
+
+BURGER_MAX_LIN_VEL = 0.22
+BURGER_MAX_ANG_VEL = 2.84
+
+WAFFLE_MAX_LIN_VEL = 0.26
+WAFFLE_MAX_ANG_VEL = 1.82
+
+LIN_VEL_STEP_SIZE = 0.01
+ANG_VEL_STEP_SIZE = 0.1
+
+def prelu(in_):
+    return 0.6*in_+0.4*np.abs(in_)
+
+# def getKey():
+#     tty.setraw(sys.stdin.fileno())
+#     rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+#     if rlist:
+#         key = sys.stdin.read(1)
+#     else:
+#         key = ''
+
+#     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+#     return key
+
+def vels(target_linear_vel, target_angular_vel):
+    return "currently:\tlinear vel %s\t angular vel %s " % (target_linear_vel,target_angular_vel)
+
+def makeSimpleProfile(output, input, slop):
+    if input > output:
+        output = min( input, output + slop )
+    elif input < output:
+        output = max( input, output - slop )
+    else:
+        output = input
+
+    return output
+
+def constrain(input, low, high):
+    if input < low:
+      input = low
+    elif input > high:
+      input = high
+    else:
+      input = input
+
+    return input
+
+def checkLinearLimitVelocity(vel):
+    if turtlebot3_model == "burger":
+      vel = constrain(vel, -BURGER_MAX_LIN_VEL, BURGER_MAX_LIN_VEL)
+    elif turtlebot3_model == "waffle" or turtlebot3_model == "waffle_pi":
+      vel = constrain(vel, -WAFFLE_MAX_LIN_VEL, WAFFLE_MAX_LIN_VEL)
+    else:
+      vel = constrain(vel, -BURGER_MAX_LIN_VEL, BURGER_MAX_LIN_VEL)
+
+    return vel
+
+def checkAngularLimitVelocity(vel):
+    if turtlebot3_model == "burger":
+      vel = constrain(vel, -BURGER_MAX_ANG_VEL, BURGER_MAX_ANG_VEL)
+    elif turtlebot3_model == "waffle" or turtlebot3_model == "waffle_pi":
+      vel = constrain(vel, -WAFFLE_MAX_ANG_VEL, WAFFLE_MAX_ANG_VEL)
+    else:
+      vel = constrain(vel, -BURGER_MAX_ANG_VEL, BURGER_MAX_ANG_VEL)
+
+    return vel
+
+class RLAgent:
+
+    def __init__(self, weights):
+        self.vars = np.load(weights).item()
+        self.pose = np.zeros([3], dtype=np.float32)
+        self.vel = np.zeros([2], dtype=np.float32)
+        self.cmd_vel = np.zeros([2], dtype=np.float32)
+        self.scan = 3.5*np.ones([360], dtype=np.float32)
+        self.target = np.array([3.5, 0.0], dtype=np.float32)
+        self.action = Twist()
+        self.action.linear.x = 0.0
+        self.action.linear.y = 0.0
+        self.action.linear.z = 0.0
+        self.action.angular.x = 0.0
+        self.action.angular.y = 0.0
+        self.action.angular.z = 0.0
+        self.pose_sub = rospy.Subscriber('pose', Odometry, self.poseCallback)
+        self.cmd_vel_sub = rospy.Subscriber('cmd_vel', Twist, self.cmdCallback)
+        self.scan_sub = rospy.Subscriber('scan', LaserScan, self.scanCallback)
+        self.action_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
+        self.buffer = []
+    
+    def poseCallback(self, msg):
+        self.pose[0] = msg.pose.pose.position.x
+        self.pose[1] = msg.pose.pose.position.y
+        self.pose[2] = 2*np.sign(msg.pose.pose.orientation.z)*np.arccos(msg.pose.pose.orientation.w)
+        self.vel[0] = msg.twist.twist.linear.x
+        self.vel[1] = msg.twist.twist.angular.z
+
+    def cmdCallback(self, msg):
+        self.cmd_vel[0] = msg.linear.x
+        self.cmd_vel[1] = msg.angular.z
+
+    def scanCallback(self, msg):
+        # print(msg.ranges)
+        scan = []
+        for data in msg.ranges:
+            if data == 0.0:
+                scan.append(3.5)
+            else:
+                scan.append(data)
+        self.scan = np.array(scan[180:]+scan[0:180], dtype=np.float32)
+        # print(self.scan)
+
+    def decision(self):
+        scan = np.reshape(self.scan, [-1, 10])
+        scan = np.array(np.max(scan, 1)/3.5, dtype=np.float32)
+        R = self.pose[2]
+        distance = np.linalg.norm(self.target-self.pose[0:2])
+        if distance > 0.1:
+            direction = np.arctan2(self.target[1]-self.pose[1], self.target[0]-self.pose[0])-self.pose[2]
+            if direction > np.pi:
+                direction -= np.pi
+            elif direction < -np.pi:
+                direction += np.pi
+            state = np.concatenate([scan, [self.action.linear.x/0.22, self.action.angular.z/2.0, distance/3.5, direction/np.pi]], 0)
+            h = np.dot(state, self.vars['actor_net/fc0/w:0'])+self.vars['actor_net/fc0/b:0']
+            h = np.dot(prelu(h), self.vars['actor_net/fc1/w:0'])+self.vars['actor_net/fc1/b:0']
+            h = np.dot(prelu(h), self.vars['actor_net/fc2/w:0'])+self.vars['actor_net/fc2/b:0']
+            h = np.dot(prelu(h), self.vars['actor_net/fc3/w:0'])+self.vars['actor_net/fc3/b:0']
+            target_linear_vel = 0.11*np.tanh(h[0])+0.11
+            target_angular_vel = 2.0*np.tanh(h[1])
+            v_norm = np.abs(target_linear_vel)+np.abs(target_angular_vel)
+            if v_norm > 1:
+                target_linear_vel = checkLinearLimitVelocity(target_linear_vel/v_norm)
+                target_angular_vel = checkAngularLimitVelocity(target_angular_vel/v_norm)
+            else:
+                target_linear_vel = checkLinearLimitVelocity(target_linear_vel)
+                target_angular_vel = checkAngularLimitVelocity(target_angular_vel)
+            self.action.linear.x = target_linear_vel
+            self.action.angular.z = target_angular_vel
+        else:
+            self.action.linear.x = 0.0
+            self.action.angular.z = 0.0
+        self.action_pub.publish(self.action)
+
+    def record(self):
+        print("pose : ", self.pose)
+        # print("scan : ", self.scan)
+        print("vel : ", self.vel)
+        print("action : ", np.array([self.action.linear.x, self.action.angular.z]))
+        # print("time : ", rospy.Time.now().to_sec())
+        self.buffer.append(
+            {
+                'pose':np.array(self.pose),
+                'scan':np.array(self.scan),
+                'vel':np.array(self.vel),
+                'cmd_vel':np.array(self.cmd_vel),
+                'action':np.array([self.action.linear.x, self.action.angular.z]),
+                'time':rospy.Time.now().to_sec()
+            }
+        )
+        np.save('savedir/buffer_50_5.npy', self.buffer)
+
+if __name__=="__main__":
+    # settings = termios.tcgetattr(sys.stdin)
+
+    rospy.init_node('turtlebot3_agent')
+    rate = rospy.Rate(10)
+    agent = RLAgent('weights/weight_0.4564.npy')
+
+    turtlebot3_model = rospy.get_param("model", "burger")
+    while not rospy.is_shutdown():
+        agent.decision()
+        agent.record()
+
+        rate.sleep()

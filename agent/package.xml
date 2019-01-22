@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>agent</name>
+  <version>1.1.0</version>
+  <description>
+    Reinforcement learning agent for TurtleBot3.
+  </description>
+  <license>BSD</license>
+  <author>Jaehyun Lim</author>
+  <author email="lim.yonsei@gmail.com">Jaehyun Lim</author>
+  <maintainer email="lim.yonsei@gmail.com">Jaehyun Lim</maintainer>
+  <url type="repository">https://github.com/lim271</url>
+  <url type="bugtracker">https://github.com/lim271</url>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+</package>
