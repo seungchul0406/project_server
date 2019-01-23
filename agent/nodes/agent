@@ -29,7 +29,7 @@
 
 import rospy
 import numpy as np
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Pose
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 import os
@@ -121,16 +121,19 @@ class RLAgent:
         self.action.angular.x = 0.0
         self.action.angular.y = 0.0
         self.action.angular.z = 0.0
-        self.pose_sub = rospy.Subscriber('pose', Odometry, self.poseCallback)
+        self.pose_sub = rospy.Subscriber('robot_pose', Pose, self.poseCallback)
+        self.odom_sub = rospy.Subscriber('odom', Odometry, self.odomCallback)
         self.cmd_vel_sub = rospy.Subscriber('cmd_vel', Twist, self.cmdCallback)
         self.scan_sub = rospy.Subscriber('scan', LaserScan, self.scanCallback)
-        self.action_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
+        # self.action_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
         self.buffer = []
     
     def poseCallback(self, msg):
-        self.pose[0] = msg.pose.pose.position.x
-        self.pose[1] = msg.pose.pose.position.y
-        self.pose[2] = 2*np.sign(msg.pose.pose.orientation.z)*np.arccos(msg.pose.pose.orientation.w)
+        self.pose[0] = msg.position.x
+        self.pose[1] = msg.position.y
+        self.pose[2] = 2*np.sign(msg.orientation.z)*np.arccos(msg.orientation.w)
+
+    def odomCallback(self, msg):
         self.vel[0] = msg.twist.twist.linear.x
         self.vel[1] = msg.twist.twist.angular.z
 
@@ -208,7 +211,7 @@ if __name__=="__main__":
 
     turtlebot3_model = rospy.get_param("model", "burger")
     while not rospy.is_shutdown():
-        agent.decision()
+        # agent.decision()
         agent.record()
 
         rate.sleep()

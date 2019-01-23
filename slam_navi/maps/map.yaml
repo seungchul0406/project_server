@@ -1,4 +1,4 @@
-image: /home/seungchul/catkin_ws/src/project_server/slam_navi/maps/map.pgm
+image: /home/mlcs/catkin_ws/src/project_server/slam_navi/maps/map.pgm
 resolution: 0.050000
 origin: [-10.000000, -10.000000, 0.000000]
 negate: 0
